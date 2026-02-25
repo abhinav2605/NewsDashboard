@@ -1,0 +1,7 @@
+.dashboard{
+    width:100%;
+    height: auto;
+    padding: 10px;
+    display: flex;
+    gap: 10px;
+}
