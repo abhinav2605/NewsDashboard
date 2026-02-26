@@ -78,3 +78,11 @@
     cursor: not-allowed;
     transform: none;
 }
+
+.categoryList{
+    display: flex;
+    /* justify-content: space-between; */
+    font-size: small;
+    margin-bottom: 12px;
+    flex-wrap: wrap;
+}

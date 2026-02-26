@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import NewsComponent from '../NewsComponent/newsComponent';
 import './dashboard.css';
+import Category from '../CategoryComponent/category';
 
 const Dashboard = () => {
     const [result, setResult] = useState([]);
@@ -37,7 +38,7 @@ const Dashboard = () => {
         const url =
             'https://newsdata.io/api/1/latest?apikey=' +
             API_KEY +
-            '&country=in&language=en&category=crime,entertainment,domestic,business,breaking' +
+            '&language=en' +
             (pageToken ? '&page=' + pageToken : '');
 
         try {
@@ -59,7 +60,6 @@ const Dashboard = () => {
 
     useEffect(() => {
         fetchNews();
-
     }, []);
 
     if (loading) return <div className="status">Loading top stories…</div>;
@@ -84,7 +84,39 @@ const Dashboard = () => {
         }
         setPage(prev => Math.min(prev + 1, totalPages - 1));
     };
+    const categoryList = ["Breaking", "Business", "Domestic", "Crime", "Education", "Entertainment", "Environment", "Food", "Health", "Lifestyle", "Other", "Politics", "Science", "Sports", "Technology", "Top", "Tourism", "World"];
 
+    const CategoriseNews = async (category, pageToken = null, append = false) => {
+        // if (append) {
+        //     setFetchingNext(true);
+        // } else {
+        //     setLoading(true);
+        //     setError(null);
+        // }
+
+        const url =
+            'https://newsdata.io/api/1/latest?apikey=' +
+            API_KEY +
+            '&language=en&category=' + category.toLowerCase()
+            // +
+            //(pageToken ? '&page=' + pageToken : '');
+
+        try {
+            const response = await axios.get(url);
+            const incoming = response.data.results || [];
+            //const next = response.data.nextPage || null;
+            //const updated = append ? mergeUnique(result, incoming) : mergeUnique([], incoming);
+            setResult(incoming);
+            //setNextToken(next);
+            //setPage(prev => (append ? prev + 1 : 0));
+        } catch (err) {
+            console.error('Error fetching data:', err);
+            setError(err.message || 'Failed to fetch news');
+        } finally {
+            setLoading(false);
+            //setFetchingNext(false);
+        }
+    }
     return (
         <div className="page-shell">
             <header className="page-header">
@@ -92,13 +124,18 @@ const Dashboard = () => {
                     <p className="eyebrow">Today • Curated for you</p>
                     <h1>Top stories</h1>
                 </div>
+
                 <div className="header-actions">
-                    <button className="ghost-btn" onClick={() => window.location.reload()}>
+                    <button className="ghost-btn" onClick={() => fetchNews()}>
                         Refresh
                     </button>
                 </div>
             </header>
-
+            <div className='categoryList'>
+                {categoryList.map(categoryName => (
+                    <Category key={categoryName} name={categoryName} onClick={() => CategoriseNews(categoryName)}/>
+                ))}
+            </div>
             <div className="news-grid">
                 {featureArticles.map(article => (
                     <NewsComponent key={`feature-${pageStart}`} article={article} variant="feature" />
