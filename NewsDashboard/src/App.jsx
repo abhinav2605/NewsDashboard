@@ -1,6 +1,5 @@
 import './App.css'
-import './components/Authentication/login'
-import Login from './components/Authentication/login'
+import Login from './components/Authentication/login.jsx'
 import { Route, Routes } from 'react-router-dom'
 import Dashboard from './components/Dashboard/dashboard'
 
