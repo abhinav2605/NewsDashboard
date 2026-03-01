@@ -9,16 +9,18 @@ const Dashboard = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [page, setPage] = useState(0);
+
+    const [totalPage, setTotalpage] = useState(0);
     const [nextToken, setNextToken] = useState(null);
     const [fetchingNext, setFetchingNext] = useState(false);
     const PAGE_SIZE = 12;
     const API_KEY = 'pub_b13f869c33bb42dcb620d590ea40bed8';
 
     const mergeUnique = (current, incoming) => {
-        const seen = new Set(current.map(item => (item?.link || item?.url || item?.title || '').trim().toLowerCase()));
+        const seen = new Set(current.map(item => (item?.title || '').trim().toLowerCase()));
         const merged = [...current];
         for (const item of incoming) {
-            const key = (item?.link || item?.url || item?.title || '').trim().toLowerCase();
+            const key = (item?.title || '').trim().toLowerCase();
             if (!key) continue;
             if (seen.has(key)) continue;
             seen.add(key);
@@ -43,10 +45,13 @@ const Dashboard = () => {
 
         try {
             const response = await axios.get(url);
+            console.log(response)
+            setTotalpage(response.data.totalResults);
             const incoming = response.data.results || [];
             const next = response.data.nextPage || null;
             const updated = append ? mergeUnique(result, incoming) : mergeUnique([], incoming);
             setResult(updated);
+            console.log(updated);
             setNextToken(next);
             setPage(prev => (append ? prev + 1 : 0));
         } catch (err) {
@@ -64,20 +69,19 @@ const Dashboard = () => {
 
     if (loading) return <div className="status">Loading top stories…</div>;
     if (error) return <div className="status error">Error: {error}</div>;
-
-    const totalPages = Math.ceil(result.length / PAGE_SIZE) || 1;
+    const totalPages = Math.ceil(totalPage / PAGE_SIZE) || 1;
     const pageStart = page * PAGE_SIZE;
     const pageItems = result.slice(pageStart, pageStart + PAGE_SIZE);
     const featureArticles = pageItems[0] ? [pageItems[0]] : [];
-    const highlightArticles = pageItems.slice(1, 3);
-    const standardArticles = pageItems.slice(3);
+    const highlightArticles = pageItems;//.slice(1, 3);
+    const standardArticles = pageItems.slice(1);
 
     const handlePrevPage = () => {
         setPage(prev => Math.max(prev - 1, 0));
     };
 
     const handleNextPage = () => {
-        const onLastLoadedPage = page >= totalPages - 1;
+        const onLastLoadedPage = page <= totalPages - 1;
         if (onLastLoadedPage && nextToken) {
             fetchNews(nextToken, true);
             return;
@@ -87,34 +91,34 @@ const Dashboard = () => {
     const categoryList = ["Breaking", "Business", "Domestic", "Crime", "Education", "Entertainment", "Environment", "Food", "Health", "Lifestyle", "Other", "Politics", "Science", "Sports", "Technology", "Top", "Tourism", "World"];
 
     const CategoriseNews = async (category, pageToken = null, append = false) => {
-        // if (append) {
-        //     setFetchingNext(true);
-        // } else {
-        //     setLoading(true);
-        //     setError(null);
-        // }
+        if (append) {
+            setFetchingNext(true);
+        } else {
+            setLoading(true);
+            setError(null);
+        }
 
         const url =
             'https://newsdata.io/api/1/latest?apikey=' +
             API_KEY +
             '&language=en&category=' + category.toLowerCase()
-            // +
-            //(pageToken ? '&page=' + pageToken : '');
+             +
+            (pageToken ? '&page=' + pageToken : '');
 
         try {
             const response = await axios.get(url);
             const incoming = response.data.results || [];
-            //const next = response.data.nextPage || null;
-            //const updated = append ? mergeUnique(result, incoming) : mergeUnique([], incoming);
+            const next = response.data.nextPage || null;
+            const updated = append ? mergeUnique(result, incoming) : mergeUnique([], incoming);
             setResult(incoming);
-            //setNextToken(next);
-            //setPage(prev => (append ? prev + 1 : 0));
+            setNextToken(next);
+            setPage(prev => (append ? prev + 1 : 0));
         } catch (err) {
             console.error('Error fetching data:', err);
             setError(err.message || 'Failed to fetch news');
         } finally {
             setLoading(false);
-            //setFetchingNext(false);
+            setFetchingNext(false);
         }
     }
     return (
