@@ -1,12 +1,12 @@
 import React from 'react'
 import './category.css'
 
-export default function Category({name, onClick})
+export default function Category({name, onClick, isSelected = false})
 {
 
     return(
         <>
-            <div className='category' onClick={onClick}>
+            <div className={`category ${isSelected ? 'selected' : ''}`} onClick={onClick}>
                 {name}
             </div>
         </>
