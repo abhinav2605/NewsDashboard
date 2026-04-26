@@ -131,9 +131,6 @@ const Dashboard = () => {
                 </div>
                 
             )}
-            <div className="news-grid">
-                    aBHI
-                </div>
 
             <div className="pagination">
                 <button className="ghost-btn" onClick={handlePrevPage} disabled={page === 0}>
