@@ -2,10 +2,13 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './login.css';
 import { supabase } from "../../lib/supabase";
+import { HugeiconsIcon } from "@hugeicons/react";
+import { Mail01Icon, LockPasswordIcon, ViewIcon, ViewOffIcon } from "@hugeicons/core-free-icons";
 
 function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
@@ -54,10 +57,10 @@ function Login() {
       }
 
       if (profile?.role === "admin") {
-        alert("Welcome Admin");
+        // alert("Welcome Admin");
         // navigate("/admin-dashboard");
       } else {
-        alert("Welcome User");
+        // alert("Welcome User");
         navigate("/dashboard");
       }
 
@@ -70,55 +73,83 @@ function Login() {
   };
 
   return (
-    <div className="login">
-      <h2>Login</h2>
+    <div className="login-shell">
+      <div className="login-card">
+        <section className="login-left-panel">
+          <h1>WELCOME BACK!</h1>
+          <p>
+            Continue where you left off and explore your personalized news dashboard.
+          </p>
+        </section>
 
-      <form onSubmit={handleLogin}>
-        <input
-          type="email"
-          placeholder="Enter Email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-        />
+        <section className="login-right-panel">
+          <h2>Sign In</h2>
 
-        <br /><br />
+          <form className="login-form" onSubmit={handleLogin}>
+            <label className="input-row" htmlFor="login-email">
+              <span>Email</span>
+              <HugeiconsIcon
+                className="field-icon"
+                icon={Mail01Icon}
+                size={24}
+                strokeWidth={2}
+                absoluteStrokeWidth
+              />
+              <input
+                id="login-email"
+                type="email"
+                placeholder="Enter your email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+              />
+            </label>
 
-        <input
-          type="password"
-          placeholder="Enter Password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-        />
+            <label className="input-row" htmlFor="login-password">
+              <span>Password</span>
+              <HugeiconsIcon
+                className="field-icon"
+                icon={LockPasswordIcon}
+                size={24}
+                strokeWidth={2}
+                absoluteStrokeWidth
+              />
+              <div className="password-input-wrap">
+                <input
+                  className={password.length > 0 ? "has-visibility-toggle" : ""}
+                  id="login-password"
+                  type={showPassword ? "text" : "password"}
+                  placeholder="Enter your password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                />
+                {password.length > 0 && (
+                  <button
+                    type="button"
+                    className="visibility-btn"
+                    onClick={() => setShowPassword((prev) => !prev)}
+                    aria-label={showPassword ? "Hide password" : "Show password"}
+                    aria-pressed={showPassword}
+                  >
+                    <HugeiconsIcon
+                      className="field-icon"
+                      icon={showPassword ? ViewIcon : ViewOffIcon}
+                      size={22}
+                      strokeWidth={2}
+                      absoluteStrokeWidth
+                    />
+                  </button>
+                )}
+              </div>
+            </label>
 
-        <br /><br />
-
-        <button type="submit" disabled={loading}>
-          {loading ? "Logging in..." : "Login"}
-        </button>
-      </form>
+            <button className="submit-btn" type="submit" disabled={loading}>
+              {loading ? "Logging in..." : "Login"}
+            </button>
+          </form>
+        </section>
+      </div>
     </div>
   );
 }
 
 export default Login;
-
-
-// export default function Login() {
-//     const navigate = useNavigate();
-//     const [username, setUsername] = useState("");
-//     const [password, setPassword] = useState("");
-//     const handleSubmit =(e)=>{
-//         e.preventDefault();
-//         if(username == "admin" && password == "1234")
-//         {
-//             navigate('/dashboard');
-//         }
-//     }
-
-//     return (<div className='login'>
-//         <h1>Login</h1>
-//         <input type="text" placeholder='Username' value={username} onChange={(e)=>setUsername(e.target.value)} /><br/>
-//         <input type="password" placeholder='Password' value={password} onChange={(e)=>setPassword(e.target.value)} /><br/>
-//         <button type='submit' onClick={handleSubmit}>Login</button>
-//         </div>)
-// }

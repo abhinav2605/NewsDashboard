@@ -15,7 +15,7 @@ const formatDate = value => {
   });
 };
 
-const NewsComponent = ({ article, variant = 'standard', showNav = false, onPrev, onNext }) => {
+const NewsComponent = ({ article, variant = 'standard', showNav = true, onPrev, onNext }) => {
   const published = article?.pubDate || article?.pub_date || '';
   const source = article?.source_id || article?.source || 'News';
   const link = article?.link || '#';
